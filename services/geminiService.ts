@@ -27,28 +27,26 @@ const getApiKey = () => {
 const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 /**
- * Searches for top attractions in a given location using Gemini with Google Search Grounding.
+ * Searches for top attractions in a given location using Gemini.
  */
 export const searchAttractionsInLocation = async (location: string): Promise<Attraction[]> => {
   const modelId = "gemini-2.5-flash"; 
 
-  const prompt = `Fast search: Find 8 top tourist attractions in India matching the query: "${location}". 
+  const prompt = `Find 8 top tourist attractions in India matching the query: "${location}". 
   
   Context:
   - If the query is a city (e.g. "Delhi"), find top general attractions there.
   - If the query is a CATEGORY (e.g. "Historical sites", "Museums", "Temples"), find the best examples of that category in the specified city or across India if no city is named.
   - If the query is "Category in City" (e.g. "Museums in Mumbai"), strictly find that category.
-
-  Use Google Search to get real-time info.
   
   For each attraction:
   - Precise coordinates.
   - Real rating (0-5).
-  - Actual opening hours.
+  - Estimated opening hours.
   - 1 concise user review.
-  - Source URL.
+  - Source reference.
   
-  Return RAW JSON Array:
+  Return ONLY a raw JSON array (no markdown, no extra text):
   [
     {
       "id": "kebab-case-name",
@@ -60,7 +58,7 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
       "openingHours": "9AM-5PM",
       "coordinates": { "lat": 12.34, "lng": 56.78 },
       "reviews": [{ "author": "Name", "comment": "Short text", "rating": 5 }],
-      "sourceUrl": "https://..."
+      "sourceUrl": "https://example.com"
     }
   ]`;
 
@@ -69,26 +67,39 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
       model: modelId,
       contents: prompt,
       config: {
-        tools: [{ googleSearch: {} }], // Enable Search Grounding
         temperature: 0.3,
       },
     });
 
-    let jsonStr = response.text || "[]";
-    jsonStr = jsonStr.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!response.text) {
+      throw new Error("Empty response from API");
+    }
+
+    let jsonStr = response.text.trim();
     
+    // Remove markdown code blocks if present
+    jsonStr = jsonStr.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    
+    // Extract JSON array
     const arrayStart = jsonStr.indexOf('[');
     const arrayEnd = jsonStr.lastIndexOf(']');
     
-    if (arrayStart !== -1 && arrayEnd !== -1) {
-      jsonStr = jsonStr.substring(arrayStart, arrayEnd + 1);
-      return JSON.parse(jsonStr) as Attraction[];
+    if (arrayStart === -1 || arrayEnd === -1) {
+      console.error("Could not find JSON array in response:", jsonStr);
+      throw new Error("Response does not contain valid JSON array");
     }
-
-    throw new Error("Failed to parse AI response");
+    
+    jsonStr = jsonStr.substring(arrayStart, arrayEnd + 1);
+    const attractions = JSON.parse(jsonStr) as Attraction[];
+    
+    if (!Array.isArray(attractions) || attractions.length === 0) {
+      throw new Error("Empty attractions array returned");
+    }
+    
+    return attractions;
   } catch (error) {
     console.error("Error fetching attractions:", error);
-    throw error;
+    throw new Error(`Failed to find attractions: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
