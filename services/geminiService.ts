@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { Attraction, GeneratedItinerary } from "../types";
+import { getAccurateAttractionData } from "./attractionDatabase";
 
 // Safe API Key retrieval for various environments (Vite, Raw HTML, Node)
 const getApiKey = () => {
@@ -96,7 +97,27 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
       throw new Error("Empty attractions array returned");
     }
     
-    return attractions;
+    // Enrich attractions with accurate data from database
+    const enrichedAttractions = attractions.map(attraction => {
+      const accurateData = getAccurateAttractionData(attraction.name);
+      
+      // If we have accurate data, override with verified information
+      if (accurateData) {
+        return {
+          ...attraction,
+          rating: accurateData.rating,
+          openingHours: accurateData.openingHours,
+          reviews: accurateData.reviews,
+          coordinates: accurateData.coordinates,
+          description: accurateData.description,
+          estimatedTime: accurateData.estimatedTime,
+        };
+      }
+      
+      return attraction;
+    });
+    
+    return enrichedAttractions;
   } catch (error) {
     console.error("Error fetching attractions:", error);
     throw new Error(`Failed to find attractions: ${error instanceof Error ? error.message : 'Unknown error'}`);
