@@ -1,22 +1,26 @@
 /**
  * Curated, accurate images for Indian attractions
- * Using Wikimedia Commons and verified sources for consistency
+ * Using specific, high-quality Unsplash photo IDs for consistency
  */
 
-// Exact image URLs for each attraction - these won't change
+// Exact image URLs for each attraction - using Unsplash high-quality images
 const exactAttractionImages: Record<string, string> = {
-  'taj-mahal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Taj_Mahal%2C_Agra%2C_India_edit3.jpg/1200px-Taj_Mahal%2C_Agra%2C_India_edit3.jpg',
-  'hawa-mahal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Hawa_Mahal%2C_Jaipur%2C_Rajasthan.jpg/1200px-Hawa_Mahal%2C_Jaipur%2C_Rajasthan.jpg',
-  'india-gate': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/India_Gate_Delhi_1.jpg/1200px-India_Gate_Delhi_1.jpg',
-  'jaipur-city-palace': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/City_Palace_Jaipur.jpg/1200px-City_Palace_Jaipur.jpg',
-  'golden-temple': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Golden_Temple%2C_Amritsar.jpg/1200px-Golden_Temple%2C_Amritsar.jpg',
-  'varanasi-ghats': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Varanasi_Ganges_Ghats_1.jpg/1200px-Varanasi_Ganges_Ghats_1.jpg',
-  'red-fort': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Lal_Qila_Delhi.JPG/1200px-Lal_Qila_Delhi.JPG',
-  'mysore-palace': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Mysore_Palace_Illuminated.jpg/1200px-Mysore_Palace_Illuminated.jpg',
-  'gateway-of-india': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Gateway_of_India_by_Jon_Choo.jpg/1200px-Gateway_of_India_by_Jon_Choo.jpg',
-  'charminar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Char_minar.jpg/1200px-Char_minar.jpg',
-  'amber-fort': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Amer_Fort_Jaipur_1.jpg/1200px-Amer_Fort_Jaipur_1.jpg',
-  'city-palace': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/City_Palace_Jaipur.jpg/1200px-City_Palace_Jaipur.jpg',
+  'taj-mahal': 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&h=600&fit=crop',
+  'hawa-mahal': 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&h=600&fit=crop',
+  'india-gate': 'https://images.unsplash.com/photo-1595053826286-2e5960912c8d?w=800&h=600&fit=crop',
+  'jaipur-city-palace': 'https://images.unsplash.com/photo-1578881944693-c48c0e5e91da?w=800&h=600&fit=crop',
+  'golden-temple': 'https://images.unsplash.com/photo-1606202823983-211b65b80d26?w=800&h=600&fit=crop',
+  'varanasi-ghats': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
+  'red-fort': 'https://images.unsplash.com/photo-1595053826286-2e5960912c8d?w=800&h=600&fit=crop',
+  'mysore-palace': 'https://images.unsplash.com/photo-1582562013453-e48e82253e5f?w=800&h=600&fit=crop',
+  'gateway-of-india': 'https://images.unsplash.com/photo-1570019614776-aed22f17547b?w=800&h=600&fit=crop',
+  'charminar': 'https://images.unsplash.com/photo-1596448224772-5dd5017ed1ea?w=800&h=600&fit=crop',
+  'amber-fort': 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&h=600&fit=crop',
+  'city-palace': 'https://images.unsplash.com/photo-1578881944693-c48c0e5e91da?w=800&h=600&fit=crop',
+  'baga-beach': 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&h=600&fit=crop',
+  'calangute-beach': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
+  'basilica-of-bom-jesus': 'https://images.unsplash.com/photo-1577720643272-265bf1daa738?w=800&h=600&fit=crop',
+  'dudhsagar-falls': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
 };
 
 export const getAttractionImageUrl = (attractionName: string): string => {
@@ -41,7 +45,7 @@ export const getAttractionImageUrl = (attractionName: string): string => {
   }
   
   // Fallback to a generic India image
-  return 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/India_Gate_Delhi_1.jpg/1200px-India_Gate_Delhi_1.jpg';
+  return 'https://images.unsplash.com/photo-1595053826286-2e5960912c8d?w=800&h=600&fit=crop';
 };
 
 /**
@@ -49,16 +53,17 @@ export const getAttractionImageUrl = (attractionName: string): string => {
  */
 export const getBackgroundImageForLocation = (locationName: string): string => {
   const locationMap: Record<string, string> = {
-    'delhi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/India_Gate_Delhi_1.jpg/1200px-India_Gate_Delhi_1.jpg',
-    'agra': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Taj_Mahal%2C_Agra%2C_India_edit3.jpg/1200px-Taj_Mahal%2C_Agra%2C_India_edit3.jpg',
-    'jaipur': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Hawa_Mahal%2C_Jaipur%2C_Rajasthan.jpg/1200px-Hawa_Mahal%2C_Jaipur%2C_Rajasthan.jpg',
-    'mumbai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Gateway_of_India_by_Jon_Choo.jpg/1200px-Gateway_of_India_by_Jon_Choo.jpg',
-    'hyderabad': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Char_minar.jpg/1200px-Char_minar.jpg',
-    'amritsar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Golden_Temple%2C_Amritsar.jpg/1200px-Golden_Temple%2C_Amritsar.jpg',
-    'varanasi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Varanasi_Ganges_Ghats_1.jpg/1200px-Varanasi_Ganges_Ghats_1.jpg',
-    'mysore': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Mysore_Palace_Illuminated.jpg/1200px-Mysore_Palace_Illuminated.jpg',
+    'delhi': 'https://images.unsplash.com/photo-1595053826286-2e5960912c8d?w=800&h=600&fit=crop',
+    'agra': 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&h=600&fit=crop',
+    'jaipur': 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&h=600&fit=crop',
+    'mumbai': 'https://images.unsplash.com/photo-1570019614776-aed22f17547b?w=800&h=600&fit=crop',
+    'hyderabad': 'https://images.unsplash.com/photo-1596448224772-5dd5017ed1ea?w=800&h=600&fit=crop',
+    'amritsar': 'https://images.unsplash.com/photo-1606202823983-211b65b80d26?w=800&h=600&fit=crop',
+    'varanasi': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
+    'mysore': 'https://images.unsplash.com/photo-1582562013453-e48e82253e5f?w=800&h=600&fit=crop',
+    'goa': 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&h=600&fit=crop',
   };
   
   const normalized = locationName.toLowerCase().trim();
-  return locationMap[normalized] || 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/India_Gate_Delhi_1.jpg/1200px-India_Gate_Delhi_1.jpg';
+  return locationMap[normalized] || 'https://images.unsplash.com/photo-1595053826286-2e5960912c8d?w=800&h=600&fit=crop';
 };
