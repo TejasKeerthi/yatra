@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Attraction } from '../types';
 import { Check, Clock, Star, MapPin } from 'lucide-react';
 import { getAttractionImageUrl } from '../services/imageService';
-import { useSupabaseImages } from '../hooks/useSupabaseImages';
 
 interface AttractionCardProps {
   attraction: Attraction;
@@ -20,10 +19,9 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   index 
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { primaryImage } = useSupabaseImages(attraction.id);
   
-  // Use Supabase image if available, fallback to default
-  const imageUrl = primaryImage?.image_url || getAttractionImageUrl(attraction.name);
+  // Use default image for now (Supabase images will load in modal)
+  const imageUrl = getAttractionImageUrl(attraction.name);
 
   return (
     <div 
