@@ -17,18 +17,13 @@ CREATE TABLE IF NOT EXISTS attraction_images (
   -- Foreign key to attractions (adjust table name if needed)
   attraction_id UUID NOT NULL REFERENCES attractions(id) ON DELETE CASCADE,
   
-  -- Cloudflare R2 storage key (path to file)
-  -- Format: attractions/1703688000000-taj-mahal.jpg
+  -- Supabase Storage path
+  -- Format: attractions/taj-mahal-123/1703688000000.jpg
   storage_key TEXT NOT NULL UNIQUE,
   
-  -- Public URLs for different use cases
-  -- Raw R2 image URL
+  -- Public Supabase Storage URL
+  -- Format: https://project-ref.supabase.co/storage/v1/object/public/hotel-photos/attractions/...
   image_url TEXT NOT NULL,
-  
-  -- ImageKit transformed URLs
-  thumbnail_url TEXT NOT NULL, -- 200x200, cropped
-  mobile_hero_url TEXT NOT NULL, -- 600px width, mobile optimized
-  desktop_hero_url TEXT NOT NULL, -- 1200px width, desktop optimized
   
   -- Metadata
   is_primary BOOLEAN DEFAULT FALSE, -- Mark as primary image for attraction

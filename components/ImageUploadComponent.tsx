@@ -1,17 +1,12 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Upload, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import axios from 'axios';
 import { 
-  generatePresignedUrl, 
+  uploadToSupabaseStorage, 
   validateImageFile, 
-  getPublicImageUrl,
-  generateStorageKey 
-} from '../services/r2Service';
-import { 
-  getThumbnail, 
-  getMobileHero, 
-  getDesktopHero 
-} from '../services/imageKitService';
+  getThumbnailUrl,
+  getMobileHeroUrl,
+  getDesktopHeroUrl 
+} from '../services/supabaseStorageService';
 import { saveAttractionImage } from '../services/supabaseService';
 
 interface ImageUploadProps {
@@ -32,11 +27,13 @@ interface UploadProgress {
 /**
  * ImageUploadComponent
  * 
- * Handles the complete image upload flow:
- * 1. Request presigned URL from backend
- * 2. Upload file directly to Cloudflare R2
- * 3. Save metadata to Supabase
- * 4. Transform images with ImageKit
+ * Handles the complete image upload flow using Supabase Storage:
+ * 1. Validate file locally
+ * 2. Upload file to Supabase Storage (hotel-photos bucket)
+ * 3. Get public URL with transformations
+ * 4. Save metadata to database
+ * 
+ * ✅ No credit card needed - Supabase Storage is completely free!
  */
 export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
   attractionId,
@@ -76,6 +73,7 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
         ...prev,
         [fileId]: { progress: 0, status: 'pending' },
       }));
+      setIsUploading(true);
 
       // 1. Validate file
       setUploadProgress((prev) => ({
@@ -83,75 +81,43 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
         [fileId]: { progress: 10, status: 'uploading' },
       }));
 
-      validateImageFile(file, 50); // Max 50MB
+      validateImageFile(file);
 
-      // 2. Generate storage key and get presigned URL
-      setUploadProgress((prev) => ({
-        ...prev,
-        [fileId]: { progress: 20, status: 'uploading' },
-      }));
-
-      const storageKey = generateStorageKey(file.name);
-      const presignedUrl = await generatePresignedUrl(
-        file.name,
-        file.type,
-        3600 // 1 hour expiration
-      );
-
-      // 3. Upload directly to R2
+      // 2. Upload to Supabase Storage
       setUploadProgress((prev) => ({
         ...prev,
         [fileId]: { progress: 30, status: 'uploading' },
       }));
 
-      await axios.put(presignedUrl, file, {
-        headers: {
-          'Content-Type': file.type,
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 70) / (progressEvent.total || 1)
-          );
-          setUploadProgress((prev) => ({
-            ...prev,
-            [fileId]: { 
-              progress: 30 + Math.min(percentCompleted, 70), 
-              status: 'uploading' 
-            },
-          }));
-        },
-      });
+      const { publicUrl, storagePath } = await uploadToSupabaseStorage(
+        file,
+        attractionId
+      );
 
-      // 4. Get public URL
+      // 3. Generate transformed URLs
+      setUploadProgress((prev) => ({
+        ...prev,
+        [fileId]: { progress: 70, status: 'uploading' },
+      }));
+
+      const thumbnailUrl = getThumbnailUrl(publicUrl);
+      const mobileHeroUrl = getMobileHeroUrl(publicUrl);
+      const desktopHeroUrl = getDesktopHeroUrl(publicUrl);
+
+      // 4. Save metadata to database
       setUploadProgress((prev) => ({
         ...prev,
         [fileId]: { progress: 85, status: 'uploading' },
       }));
 
-      const publicImageUrl = getPublicImageUrl(storageKey);
-
-      // 5. Generate transformed URLs
-      const thumbnailUrl = getThumbnail(publicImageUrl);
-      const mobileHeroUrl = getMobileHero(publicImageUrl);
-      const desktopHeroUrl = getDesktopHero(publicImageUrl);
-
-      // 6. Save metadata to Supabase
-      setUploadProgress((prev) => ({
-        ...prev,
-        [fileId]: { progress: 95, status: 'uploading' },
-      }));
-
       const savedImage = await saveAttractionImage(
         attractionId,
-        storageKey,
-        publicImageUrl,
-        thumbnailUrl,
-        mobileHeroUrl,
-        desktopHeroUrl,
+        storagePath,
+        publicUrl,
         false // Not primary initially
       );
 
-      // 7. Mark as success
+      // 5. Mark as success
       setUploadProgress((prev) => ({
         ...prev,
         [fileId]: { progress: 100, status: 'success' },
@@ -169,6 +135,7 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
           delete updated[fileId];
           return updated;
         });
+        setIsUploading(false);
       }, 3000);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -185,6 +152,8 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
       if (onUploadError) {
         onUploadError(err);
       }
+
+      setIsUploading(false);
 
       // Auto-remove error after 5 seconds
       setTimeout(() => {
@@ -300,10 +269,10 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
       </div>
 
       {/* Info Box */}
-      <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-        <p className="text-xs text-blue-900 dark:text-blue-200">
-          <strong>How it works:</strong> Images are uploaded directly to Cloudflare R2 
-          and automatically optimized with ImageKit for all devices.
+      <div className="mt-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+        <p className="text-xs text-green-900 dark:text-green-200">
+          <strong>✅ No credit card needed!</strong> Images are uploaded directly to 
+          Supabase Storage (completely free). Metadata saved to your database.
         </p>
       </div>
     </div>

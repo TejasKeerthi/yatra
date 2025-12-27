@@ -16,32 +16,27 @@ export interface AttractionImage {
   attraction_id: string;
   storage_key: string;
   image_url: string;
-  thumbnail_url: string;
-  mobile_hero_url: string;
-  desktop_hero_url: string;
+  thumbnail_url?: string;
+  mobile_hero_url?: string;
+  desktop_hero_url?: string;
   is_primary?: boolean;
   created_at?: string;
 }
 
 /**
  * Save image metadata to Supabase
- * Call this after successful R2 upload
+ * Call this after successful Supabase Storage upload
  * 
  * @param attractionId - ID of the attraction
- * @param storageKey - Storage key from R2 (e.g., 'attractions/1703688000000-taj-mahal.jpg')
- * @param imageUrl - Public R2 URL
- * @param thumbnailUrl - ImageKit thumbnail URL
- * @param mobileHeroUrl - ImageKit mobile URL
- * @param desktopHeroUrl - ImageKit desktop URL
+ * @param storagePath - Storage path from Supabase Storage (e.g., 'attractions/taj-mahal-123/1703688000000.jpg')
+ * @param publicImageUrl - Public Supabase Storage URL
+ * @param isPrimary - Whether this is the primary image
  * @returns Created image record
  */
 export const saveAttractionImage = async (
   attractionId: string,
-  storageKey: string,
-  imageUrl: string,
-  thumbnailUrl: string,
-  mobileHeroUrl: string,
-  desktopHeroUrl: string,
+  storagePath: string,
+  publicImageUrl: string,
   isPrimary: boolean = false
 ): Promise<AttractionImage> => {
   const { data, error } = await supabase
@@ -49,11 +44,8 @@ export const saveAttractionImage = async (
     .insert([
       {
         attraction_id: attractionId,
-        storage_key: storageKey,
-        image_url: imageUrl,
-        thumbnail_url: thumbnailUrl,
-        mobile_hero_url: mobileHeroUrl,
-        desktop_hero_url: desktopHeroUrl,
+        storage_key: storagePath,
+        image_url: publicImageUrl,
         is_primary: isPrimary,
       },
     ])
