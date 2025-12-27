@@ -105,9 +105,39 @@ interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
-const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
-  return <>{children}</>;
-};
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error boundary caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          <h1>⚠️ Something went wrong</h1>
+          <p>{this.state.error?.message}</p>
+          <button onClick={() => window.location.reload()}>Reload Page</button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const AppContent: React.FC = () => {
   // Auth State
