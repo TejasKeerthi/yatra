@@ -44,10 +44,13 @@ export const useSupabaseImages = (attractionId: string): UseSupabaseImagesReturn
 
       // Fetch all images
       const all = await getAttractionImages(attractionId);
-      setAllImages(all);
+      setAllImages(all || []);
     } catch (err) {
       console.error('Error fetching attraction images:', err);
       setError(err instanceof Error ? err.message : 'Failed to load images');
+      // Don't crash the app - just show no images
+      setPrimaryImage(null);
+      setAllImages([]);
     } finally {
       setLoading(false);
     }

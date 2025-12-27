@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS attraction_images (
   -- Unique identifier
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
-  -- Foreign key to attractions (adjust table name if needed)
-  attraction_id UUID NOT NULL REFERENCES attractions(id) ON DELETE CASCADE,
+  -- Foreign key to attractions (TEXT because attraction.id is a string)
+  attraction_id TEXT NOT NULL,
   
   -- Supabase Storage path
   -- Format: attractions/taj-mahal-123/1703688000000.jpg
@@ -95,9 +95,6 @@ SELECT DISTINCT ON (attraction_id)
   id,
   storage_key,
   image_url,
-  thumbnail_url,
-  mobile_hero_url,
-  desktop_hero_url,
   created_at
 FROM attraction_images
 WHERE is_primary = TRUE
@@ -110,9 +107,6 @@ SELECT
   id,
   storage_key,
   image_url,
-  thumbnail_url,
-  mobile_hero_url,
-  desktop_hero_url,
   is_primary,
   created_at
 FROM attraction_images

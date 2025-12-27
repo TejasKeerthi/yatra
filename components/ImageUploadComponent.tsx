@@ -185,7 +185,7 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
   };
 
   const hasActiveUploads = Object.values(uploadProgress).some(
-    (p) => p.status === 'uploading'
+    (p: any) => p.status === 'uploading'
   );
 
   return (
@@ -226,7 +226,7 @@ export const ImageUploadComponent: React.FC<ImageUploadProps> = ({
 
       {/* Upload Progress Items */}
       <div className="mt-4 space-y-2">
-        {Object.entries(uploadProgress).map(([fileId, upload]) => (
+        {Object.entries(uploadProgress).map(([fileId, upload]: [string, any]) => (
           <div
             key={fileId}
             className="bg-white dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700"
