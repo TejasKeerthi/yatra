@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, Component, ReactNode } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Search, MapPin, Sparkles, ArrowRight, Loader2, LogOut, User as UserIcon, Info, Moon, Sun, Plane, Map } from 'lucide-react';
 import { AppState, Attraction, GeneratedItinerary } from './types';
 import { searchAttractionsInLocation, generateTripItinerary } from './services/geminiService';
@@ -96,64 +96,18 @@ const LoadingScreen: React.FC<{ messages: string[] }> = ({ messages }) => {
           style={{ width: `${progress}%` }}
         />
       </div>
-      
-      <p className="text-slate-500 dark:text-slate-400 mt-4 text-sm font-medium tracking-wide">
-        Powered by Gemini AI
-      </p>
     </div>
   );
 };
 
 // Error Boundary Component to prevent white screen crashes
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6 text-center">
-          <div className="max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              We encountered an unexpected issue. Please try refreshing the page.
-            </p>
-            <pre className="text-xs bg-slate-100 dark:bg-slate-900 p-4 rounded mb-6 overflow-auto text-left text-red-600">
-              {this.state.error?.message}
-            </pre>
-            <button 
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
-            >
-              Refresh Page
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
+const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
+  return <>{children}</>;
+};
 
 const AppContent: React.FC = () => {
   // Auth State
@@ -324,7 +278,7 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="animate-spin text-brand-500" size={40} />
-          <p className="text-slate-400 font-medium tracking-wide">INITIALIZING YATRA...</p>
+          <p className="text-slate-400 font-medium tracking-wide">INITIALIZING NATKHAT...</p>
         </div>
       </div>
     );
@@ -357,9 +311,9 @@ const AppContent: React.FC = () => {
           
           <div className="flex items-center gap-2 cursor-pointer group" onClick={handleReset}>
             <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform">
-              Y
+              N
             </div>
-            <span className={`font-bold text-2xl tracking-tight hidden sm:block ${appState === AppState.IDLE ? 'text-white' : 'text-slate-800 dark:text-white'}`}>Yatra</span>
+            <span className={`font-bold text-2xl tracking-tight hidden sm:block ${appState === AppState.IDLE ? 'text-white' : 'text-slate-800 dark:text-white'}`}>Natkhat</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -411,9 +365,9 @@ const AppContent: React.FC = () => {
               <span className="text-sm font-semibold tracking-wide text-teal-50">AI-POWERED LOCAL GUIDE</span>
             </div>
             
-            <h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tight drop-shadow-2xl">
-              Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">Magic</span> <br/>
-              Everywhere.
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tighter drop-shadow-2xl">
+              Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300">Hidden</span> <br/>
+              India.
             </h1>
             
             <p className="text-lg md:text-2xl text-slate-200 mb-12 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-lg">
