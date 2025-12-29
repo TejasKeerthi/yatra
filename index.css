@@ -1,0 +1,9 @@
+/* Global styles */
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/30 dark:border-slate-700/50;
+  }
+}
+
+/* Add your global CSS here */
