@@ -2,6 +2,9 @@
 
 Yatra is an AI-powered travel planning application built with React, TypeScript, and Google Gemini. It creates personalized itineraries for Indian destinations complete with real-time data, maps, and PDF export.
 
+## 🚀 Live Demo
+**[View Live App](https://tejaskeerthi.github.io/yatra/)** - https://tejaskeerthi.github.io/yatra/
+
 ## Features
 - **AI Search**: Finds top attractions using Google Search Grounding.
 - **Smart Itineraries**: Generates day-by-day plans with local food spots, transport costs, and safety tips.
