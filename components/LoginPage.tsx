@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowRight, Loader2, Plane, Map as MapIcon, UserPlus, LogIn, Moon, Sun, Mail } from 'lucide-react';
 import { loginWithGoogle, loginWithMicrosoft, loginWithEmail, registerWithEmail } from '../services/authService';
+import gsap from 'gsap';
 
 interface LoginPageProps {
   onLoginSuccess: (user: any) => void;
@@ -15,6 +16,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (formRef.current) {
+      gsap.from(formRef.current, {
+        opacity: 0,
+        x: 50,
+        duration: 0.7,
+        ease: 'power3.out',
+      });
+    }
+  }, [authMode]);
 
   const handleProviderLogin = async (provider: 'google' | 'microsoft') => {
     setIsLoading(true);
@@ -120,7 +133,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
           </div>
         </div>
 
-        <div className="max-w-md w-full animate-in slide-in-from-right-8 duration-700">
+        <div className="max-w-md w-full smooth-fade-in" ref={formRef}>
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
               {authMode === 'signin' ? 'Welcome Back' : 'Create Account'}
@@ -148,7 +161,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none smooth-hover"
                   placeholder="you@example.com"
                 />
                 <Mail className="absolute right-3 top-3.5 text-slate-400" size={18} />
@@ -162,7 +175,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none smooth-hover"
                 placeholder="••••••••"
               />
             </div>
@@ -170,7 +183,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-slate-900 dark:bg-brand-600 hover:bg-slate-800 dark:hover:bg-brand-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 bg-slate-900 dark:bg-brand-600 hover:bg-slate-800 dark:hover:bg-brand-700 text-white rounded-xl font-semibold smooth-hover disabled:opacity-70 flex items-center justify-center gap-2"
             >
               {isLoading ? <Loader2 size={18} className="animate-spin" /> : (authMode === 'signin' ? <LogIn size={18} /> : <UserPlus size={18} />)}
               {authMode === 'signin' ? 'Sign In' : 'Create Account'}
@@ -191,7 +204,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
             <button
               onClick={() => handleProviderLogin('google')}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 p-4 rounded-2xl transition-all duration-200 shadow-sm disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 p-4 rounded-2xl smooth-hover shadow-sm disabled:opacity-70"
             >
                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -206,7 +219,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
             <button
               onClick={() => handleProviderLogin('microsoft')}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 p-4 rounded-2xl transition-all duration-200 shadow-sm disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-3 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 p-4 rounded-2xl smooth-hover shadow-sm disabled:opacity-70"
             >
               <svg className="w-5 h-5 shrink-0" viewBox="0 0 23 23">
                 <path fill="#f25022" d="M1 1h10v10H1z"/>
@@ -221,7 +234,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
           <div className="mt-8 text-center space-y-4">
              <button 
                onClick={() => setAuthMode(authMode === 'signin' ? 'signup' : 'signin')}
-               className="text-brand-600 dark:text-brand-400 font-semibold hover:underline text-sm"
+               className="text-brand-600 dark:text-brand-400 font-semibold hover:underline text-sm smooth-hover"
              >
                {authMode === 'signin' ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
              </button>
@@ -229,7 +242,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onGuestAcc
              <div>
               <button 
                 onClick={onGuestAccess}
-                className="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-200 text-sm flex items-center justify-center gap-1 mx-auto transition-colors"
+                className="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-200 text-sm flex items-center justify-center gap-1 mx-auto smooth-hover"
               >
                 Continue as Guest <ArrowRight size={14} />
               </button>

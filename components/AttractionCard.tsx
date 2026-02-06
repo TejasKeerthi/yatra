@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Attraction } from '../types';
 import { Check, Clock, Star, MapPin } from 'lucide-react';
 import { getAttractionImageUrl } from '../services/imageService';
+import gsap from 'gsap';
 
 interface AttractionCardProps {
   attraction: Attraction;
@@ -19,18 +20,58 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   index 
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   
   // Use default image for now (Supabase images will load in modal)
   const imageUrl = getAttractionImageUrl(attraction.name);
 
+  // Staggered entrance animation
+  useEffect(() => {
+    if (cardRef.current) {
+      gsap.from(cardRef.current, {
+        opacity: 0,
+        y: 30,
+        duration: 0.6,
+        delay: index * 0.1,
+        ease: 'power3.out',
+      });
+    }
+  }, [index]);
+
+  // Smooth on hover animation
+  const handleMouseEnter = () => {
+    if (cardRef.current) {
+      gsap.to(cardRef.current, {
+        y: -8,
+        boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.3)',
+        duration: 0.3,
+        ease: 'power3.out',
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (cardRef.current) {
+      gsap.to(cardRef.current, {
+        y: 0,
+        boxShadow: isSelected ? '0 20px 25px -5px rgba(0, 0, 0, 0.1)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        duration: 0.3,
+        ease: 'power3.out',
+      });
+    }
+  };
+
   return (
     <div 
+      ref={cardRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className={`
         group h-full flex flex-col rounded-2xl overflow-hidden 
-        bg-white dark:bg-slate-800 transition-all duration-400
+        bg-white dark:bg-slate-800 smooth-hover
         ${isSelected 
           ? 'ring-3 ring-teal-500 shadow-2xl shadow-teal-500/20 scale-105 dark:ring-offset-slate-900 dark:ring-offset-2' 
-          : 'shadow-lg hover:shadow-2xl hover:-translate-y-2'
+          : 'shadow-lg'
         }
       `}
     >
@@ -40,7 +81,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           src={imageUrl} 
           alt={attraction.name}
           className={`
-            w-full h-full object-cover transition-all duration-500
+            w-full h-full object-cover smooth-hover
             ${imageLoaded ? 'opacity-100' : 'opacity-20'}
             group-hover:scale-105
           `}
@@ -52,7 +93,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         />
 
         {/* Quick Rating Badge - Top Left */}
-        <div className="absolute top-3 left-3 flex items-center gap-2 bg-yellow-400 px-3 py-1.5 rounded-full shadow-md">
+        <div className="absolute top-3 left-3 flex items-center gap-2 bg-yellow-400 px-3 py-1.5 rounded-full shadow-md smooth-hover">
           <Star size={14} className="text-yellow-700 fill-yellow-700" strokeWidth={3} />
           <span className="text-xs font-bold text-yellow-900">
             {attraction.rating.toFixed(1)}
@@ -64,12 +105,12 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
       <div className="flex flex-col flex-grow p-5 space-y-4">
         
         {/* Title */}
-        <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight line-clamp-2">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight line-clamp-2 smooth-hover">
           {attraction.name}
         </h3>
 
         {/* Duration Info */}
-        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 smooth-hover">
           <div className="bg-teal-50 dark:bg-teal-900/30 p-2 rounded-lg">
             <Clock size={16} className="text-teal-600 dark:text-teal-400" strokeWidth={2.5} />
           </div>
@@ -79,13 +120,13 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         </div>
 
         {/* Description */}
-        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed flex-grow">
+        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed flex-grow smooth-hover">
           {attraction.description}
         </p>
 
         {/* Category Badge */}
         <div className="inline-block">
-          <span className="inline-block bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-xs font-bold px-3 py-1.5 rounded-full capitalize">
+          <span className="inline-block bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-xs font-bold px-3 py-1.5 rounded-full capitalize smooth-hover">
             {attraction.category}
           </span>
         </div>
@@ -96,7 +137,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
             onClick={() => onViewDetails(attraction)}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg 
               text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300
-              hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors font-semibold text-sm"
+              hover:bg-teal-50 dark:hover:bg-teal-900/30 smooth-hover font-semibold text-sm"
           >
             <MapPin size={16} strokeWidth={2.5} />
             <span>Details</span>
@@ -106,7 +147,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
             onClick={() => onToggle(attraction)}
             className={`
               flex items-center justify-center px-4 py-2.5 rounded-lg font-bold 
-              transition-all duration-300 
+              smooth-hover
               ${isSelected
                 ? 'bg-teal-500 text-white hover:bg-teal-600 shadow-md'
                 : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-600'

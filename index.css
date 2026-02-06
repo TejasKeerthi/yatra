@@ -1,9 +1,118 @@
 /* Global styles */
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8b5cf6 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #8b5cf6;
+  border-radius: 5px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #ec4899;
+  background-clip: content-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @layer components {
   .glass-panel {
     @apply bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/30 dark:border-slate-700/50;
   }
+
+  /* Smooth fade-in animations */
+  .smooth-fade-in {
+    @apply animate-in fade-in duration-700 ease-out;
+  }
+
+  .smooth-slide-up {
+    @apply animate-in slide-in-from-bottom-6 duration-700 ease-out;
+  }
+
+  .smooth-scale-in {
+    @apply animate-in zoom-in duration-500 ease-out;
+  }
+
+  /* Hover smooth transitions */
+  .smooth-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Button smooth stagger effect */
+  .stagger-item {
+    @apply animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out fill-mode-both;
+  }
+
+  /* Glow effect */
+  .glow-effect {
+    @apply drop-shadow-[0_0_20px_rgba(139,92,246,0.5)];
+  }
+
+  /* Float animation */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .animate-float {
+    @apply animate-[float_6s_ease-in-out_infinite];
+  }
+
+  /* Pulse glow */
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 0 rgba(139, 92, 246, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
+    }
+  }
+
+  .animate-pulse-glow {
+    @apply animate-[pulse-glow_3s_ease-in-out_infinite];
+  }
+
+  /* Smooth backdrop blur */
+  .smooth-blur {
+    @apply backdrop-blur-md transition-all duration-300;
+  }
 }
 
-/* Add your global CSS here */
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

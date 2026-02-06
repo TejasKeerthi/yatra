@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Attraction } from '../types';
 import { X, MapPin, Clock, Star, ExternalLink, Check, Globe, Upload } from 'lucide-react';
 import { useSupabaseImages } from '../hooks/useSupabaseImages';
 import { ImageUploadComponent } from './ImageUploadComponent';
+import gsap from 'gsap';
 
 interface AttractionDetailsModalProps {
   attraction: Attraction;
@@ -21,6 +22,30 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
 }) => {
   const [showUpload, setShowUpload] = useState(false);
   const { primaryImage, allImages, loading, refetch } = useSupabaseImages(attraction.id);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && modalRef.current && backdropRef.current) {
+      gsap.to(backdropRef.current, {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out',
+      });
+      gsap.from(modalRef.current, {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power3.out',
+      });
+    } else if (!isOpen && backdropRef.current) {
+      gsap.to(backdropRef.current, {
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -32,17 +57,18 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        ref={backdropRef}
+        className="absolute inset-0 bg-slate-900/60 smooth-blur opacity-0"
         onClick={onClose}
       />
 
       {/* Modal Content */}
-      <div className="relative bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row animate-in zoom-in-95 duration-300 border dark:border-slate-800">
+      <div ref={modalRef} className="relative bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row smooth-scale-in border dark:border-slate-800">
         
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+          className="absolute top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full smooth-blur smooth-hover"
         >
           <X size={20} />
         </button>
@@ -65,7 +91,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   <button
                     onClick={() => setShowUpload(true)}
-                    className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-lg"
+                    className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 smooth-hover shadow-lg"
                   >
                     <Upload size={18} />
                     Add Photo
@@ -139,7 +165,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
              <button
                onClick={() => onToggle(attraction)}
                className={`
-                 w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all
+                 w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 smooth-hover
                  ${isSelected 
                    ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800' 
                    : 'bg-brand-600 dark:bg-brand-600 text-white hover:bg-brand-700 shadow-lg shadow-brand-200 dark:shadow-none'}
@@ -157,7 +183,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
                   href={mapUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 py-3.5 rounded-xl font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-3.5 rounded-xl font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2 smooth-hover"
                 >
                   <MapPin size={18} /> Maps
                 </a>
@@ -167,7 +193,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
                     href={attraction.sourceUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 py-3.5 rounded-xl font-semibold text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 hover:bg-brand-100 dark:hover:bg-brand-900/50 flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 py-3.5 rounded-xl font-semibold text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 hover:bg-brand-100 dark:hover:bg-brand-900/50 flex items-center justify-center gap-2 smooth-hover"
                   >
                     <Globe size={18} /> Source
                   </a>
@@ -195,7 +221,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
              {!showUpload && allImages.length === 0 && (
                <button
                  onClick={() => setShowUpload(true)}
-                 className="w-full py-2.5 rounded-lg font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center gap-2 transition-colors text-sm"
+                 className="w-full py-2.5 rounded-lg font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center gap-2 smooth-hover text-sm"
                >
                  <Upload size={16} /> Add Photos
                </button>
@@ -207,7 +233,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Photos ({allImages.length})</h4>
                    <button
                      onClick={() => setShowUpload(!showUpload)}
-                     className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
+                     className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 smooth-hover"
                    >
                      {showUpload ? 'Hide' : 'Add More'}
                    </button>

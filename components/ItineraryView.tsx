@@ -6,6 +6,7 @@ import { saveItineraryToCloud } from '../services/shareService';
 import { downloadItineraryPDF } from '../services/pdfService';
 import { fetchWeather, WeatherData, getWeatherCondition } from '../services/weatherService';
 import { ShareModal } from './ShareModal';
+import gsap from 'gsap';
 
 interface ItineraryViewProps {
   itinerary: GeneratedItinerary;
@@ -27,6 +28,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadWeather = async () => {
@@ -47,6 +49,16 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
     };
     loadWeather();
   }, [coordinates, itinerary]);
+
+  // Smooth scroll animation on day change
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.to(window, {
+        duration: 0.8,
+        ease: 'power3.inOut',
+      });
+    }
+  }, [activeDay]);
 
   const handleShare = async () => {
     if (shareUrl) {
@@ -72,7 +84,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-20 animate-in fade-in duration-700 slide-in-from-bottom-4">
+    <div ref={containerRef} className="max-w-7xl mx-auto pb-20 smooth-fade-in smooth-slide-up">
       <ShareModal 
         isOpen={isShareModalOpen} 
         onClose={() => setIsShareModalOpen(false)} 
@@ -85,7 +97,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
         <div className="absolute top-0 right-0 hidden md:flex items-center gap-2">
            <button
              onClick={handleDownloadPDF}
-             className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-full text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-md transition-all"
+             className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-full text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-md smooth-hover"
            >
              <FileDown size={16} />
              PDF
@@ -94,7 +106,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
            <button
              onClick={handleShare}
              disabled={isShareLoading}
-             className="flex items-center gap-2 px-4 py-2 bg-brand-600 border border-brand-600 shadow-sm rounded-full text-sm font-semibold text-white hover:bg-brand-700 hover:shadow-md transition-all disabled:opacity-70"
+             className="flex items-center gap-2 px-4 py-2 bg-brand-600 border border-brand-600 shadow-sm rounded-full text-sm font-semibold text-white hover:bg-brand-700 hover:shadow-md smooth-hover disabled:opacity-70"
            >
              {isShareLoading ? <Loader2 size={16} className="animate-spin" /> : <Share2 size={16} />}
              Share
@@ -113,7 +125,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
 
           {/* Weather Widget */}
           {weather && (
-            <div className="w-full md:w-auto flex-shrink-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700 p-4 rounded-2xl shadow-sm animate-in slide-in-from-right-4">
+            <div className="w-full md:w-auto flex-shrink-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700 p-4 rounded-2xl shadow-sm smooth-fade-in smooth-scale-in">
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-center gap-2">
                    {getWeatherIcon(getWeatherCondition(weather.current.weatherCode).iconType, 32)}
@@ -125,7 +137,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
                 <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
                 <div className="flex gap-4">
                   {weather.forecast.map((day, idx) => (
-                    <div key={idx} className="text-center">
+                    <div key={idx} className="text-center smooth-hover">
                       <div className="text-xs font-bold text-slate-400 mb-1">{day.date}</div>
                       {getWeatherIcon(getWeatherCondition(day.weatherCode).iconType, 20)}
                       <div className="text-xs font-medium text-slate-700 dark:text-slate-300 mt-1">{day.maxTemp}°</div>
@@ -141,7 +153,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
         <div className="md:hidden mt-6 flex justify-center gap-3">
            <button
              onClick={handleDownloadPDF}
-             className="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-full text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+             className="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-full text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 smooth-hover"
            >
              <FileDown size={16} />
              PDF
@@ -149,7 +161,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ itinerary, locatio
            <button
              onClick={handleShare}
              disabled={isShareLoading}
-             className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-600 border border-brand-600 shadow-sm rounded-full text-sm font-semibold text-white hover:bg-brand-700 transition-all"
+             className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-600 border border-brand-600 shadow-sm rounded-full text-sm font-semibold text-white hover:bg-brand-700 smooth-hover"
            >
              {isShareLoading ? <Loader2 size={16} className="animate-spin" /> : <Share2 size={16} />}
              Share

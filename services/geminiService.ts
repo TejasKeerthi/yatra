@@ -21,7 +21,9 @@ const getApiKey = () => {
   } catch(e) {}
 
   // No fallback - require explicit environment variable
-  throw new Error("Gemini API key not found. Please set VITE_GEMINI_API_KEY environment variable.");
+  const errorMsg = "Gemini API key not found. Please create a .env.local file with: VITE_GEMINI_API_KEY=your_api_key_here (Get it from https://aistudio.google.com/app/apikey)";
+  console.error(errorMsg);
+  throw new Error(errorMsg);
 };
 
 // Initialize Gemini Client
@@ -64,6 +66,8 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
   ]`;
 
   try {
+    console.log(`[Gemini] Searching attractions for: "${location}"`);
+    
     const response = await ai.models.generateContent({
       model: modelId,
       contents: prompt,
@@ -72,11 +76,14 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
       },
     });
 
+    console.log(`[Gemini] Response received:`, response);
+
     if (!response.text) {
-      throw new Error("Empty response from API");
+      throw new Error("Empty response from API - Gemini returned no text");
     }
 
     let jsonStr = response.text.trim();
+    console.log(`[Gemini] Raw response text:`, jsonStr);
     
     // Remove markdown code blocks if present
     jsonStr = jsonStr.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -86,16 +93,26 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
     const arrayEnd = jsonStr.lastIndexOf(']');
     
     if (arrayStart === -1 || arrayEnd === -1) {
-      console.error("Could not find JSON array in response:", jsonStr);
-      throw new Error("Response does not contain valid JSON array");
+      console.error("[Gemini] Could not find JSON array in response:", jsonStr);
+      throw new Error(`Response does not contain valid JSON array. Got: "${jsonStr.substring(0, 100)}..."`);
     }
     
     jsonStr = jsonStr.substring(arrayStart, arrayEnd + 1);
-    const attractions = JSON.parse(jsonStr) as Attraction[];
+    
+    let attractions: Attraction[];
+    try {
+      attractions = JSON.parse(jsonStr) as Attraction[];
+    } catch (parseErr) {
+      console.error("[Gemini] JSON parse error:", parseErr);
+      console.error("[Gemini] Attempted to parse:", jsonStr.substring(0, 200));
+      throw new Error(`Invalid JSON in response: ${parseErr instanceof Error ? parseErr.message : 'Unknown parse error'}`);
+    }
     
     if (!Array.isArray(attractions) || attractions.length === 0) {
-      throw new Error("Empty attractions array returned");
+      throw new Error(`No attractions found. Parsed ${attractions?.length || 0} items`);
     }
+    
+    console.log(`[Gemini] Successfully parsed ${attractions.length} attractions`);
     
     // Enrich attractions with accurate data from database
     const enrichedAttractions = attractions.map(attraction => {
@@ -119,8 +136,10 @@ export const searchAttractionsInLocation = async (location: string): Promise<Att
     
     return enrichedAttractions;
   } catch (error) {
-    console.error("Error fetching attractions:", error);
-    throw new Error(`Failed to find attractions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const errorDetails = error instanceof Error ? error.message : String(error);
+    console.error("[Gemini] Error fetching attractions:", error);
+    console.error("[Gemini] Error details:", errorDetails);
+    throw new Error(`Failed to find attractions: ${errorDetails}`);
   }
 };
 

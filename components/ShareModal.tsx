@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Link, Mail, Check, Copy } from 'lucide-react';
+import gsap from 'gsap';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -9,6 +10,30 @@ interface ShareModalProps {
 
 export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url }) => {
   const [copied, setCopied] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && modalRef.current && backdropRef.current) {
+      gsap.to(backdropRef.current, {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out',
+      });
+      gsap.from(modalRef.current, {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power3.out',
+      });
+    } else if (!isOpen && backdropRef.current) {
+      gsap.to(backdropRef.current, {
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -32,15 +57,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url }) 
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        ref={backdropRef}
+        className="absolute inset-0 bg-slate-900/60 smooth-blur opacity-0"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-300 border dark:border-slate-800">
+      <div ref={modalRef} className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl p-6 shadow-2xl smooth-scale-in border dark:border-slate-800">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 smooth-hover"
         >
           <X size={20} />
         </button>
@@ -65,7 +91,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url }) 
             <button
               onClick={handleCopy}
               className={`
-                p-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5
+                p-2 rounded-lg text-sm font-semibold smooth-hover flex items-center gap-1.5
                 ${copied 
                   ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
                   : 'bg-white dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600'}
@@ -81,7 +107,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url }) 
         <div className="grid grid-cols-1 gap-3">
           <button 
             onClick={handleEmail}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200 dark:shadow-none"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold bg-brand-600 text-white hover:bg-brand-700 smooth-hover shadow-lg shadow-brand-200 dark:shadow-none"
           >
             <Mail size={18} /> Send via Email
           </button>

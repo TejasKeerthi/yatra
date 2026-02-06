@@ -8,6 +8,7 @@ import { AttractionDetailsModal } from './components/AttractionDetailsModal';
 import { ItineraryView } from './components/ItineraryView';
 import { LoginPage } from './components/LoginPage';
 import { logoutUser, subscribeToAuthChanges } from './services/authService';
+import { useSmoothScroll } from './hooks/useSmoothScroll';
 
 // --- Hero Slideshow Component ---
 const HERO_IMAGES = [
@@ -140,6 +141,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 const AppContent: React.FC = () => {
+  // Initialize smooth scrolling
+  useSmoothScroll();
+
   // Auth State
   const [user, setUser] = useState<any>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
@@ -250,7 +254,18 @@ const AppContent: React.FC = () => {
       setAttractions(results);
       setAppState(AppState.SELECTING);
     } catch (err) {
-      setError("Failed to find attractions. Please check your connection or try a different city.");
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      
+      // Check if it's an API key error
+      if (errorMsg.includes('API key') || errorMsg.includes('VITE_GEMINI_API_KEY')) {
+        setError("Setup required: Please create a .env.local file with your Gemini API key. Get one at https://aistudio.google.com/app/apikey");
+      } else if (errorMsg.includes('Empty response') || errorMsg.includes('JSON')) {
+        setError("AI service error - please try again in a moment or try a different location.");
+      } else {
+        setError("Failed to find attractions. Check your connection or try a different city.");
+      }
+      
+      console.error("Search error:", errorMsg);
       setAppState(AppState.IDLE);
     }
   };
@@ -275,7 +290,15 @@ const AppContent: React.FC = () => {
       setItinerary(plan);
       setAppState(AppState.VIEWING_PLAN);
     } catch (err) {
-      setError("Failed to create itinerary. AI might be busy, please try again.");
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      
+      if (errorMsg.includes('API key') || errorMsg.includes('VITE_GEMINI_API_KEY')) {
+        setError("Setup required: Please create a .env.local file with your Gemini API key. Get one at https://aistudio.google.com/app/apikey");
+      } else {
+        setError("Failed to create itinerary. AI might be busy, please try again.");
+      }
+      
+      console.error("Itinerary generation error:", errorMsg);
       setAppState(AppState.SELECTING);
     }
   };
